@@ -31,6 +31,8 @@ class ParallaxSprite: SKSpriteNode {
         let texture : SKTexture = SKTexture(imageNamed: name)
         super.init(texture: nil, color: SKColor.clear, size: CGSize.zero)
         
+        self.parallaxSpeed = speed
+        
         self.image1 = SKSpriteNode(texture: texture, size: texture.size())
         self.image1.position = CGPoint(x: frame.midX, y: frame.midY)
         self.addChild(image1)

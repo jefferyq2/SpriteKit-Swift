@@ -28,7 +28,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var starCounter : Int = 0
     
     override func didMove(to view: SKView) {
-        let ref = CreateManager.createBackground(self);
+        let ref = CreateManager.createBackground(self)
         
         background = ref.background
         parallax = ref.parallax

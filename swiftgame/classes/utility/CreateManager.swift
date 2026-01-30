@@ -63,7 +63,7 @@ struct CreateManager {
     
     static func createStar(parent : SKScene)->SKSpriteNode{
         let star : SKSpriteNode = SKSpriteNode(imageNamed: "Star")
-        let rnd : CGFloat = CGFloat(arc4random() % 100)
+        let rnd : CGFloat = CGFloat.random(in: 0..<100)
         star.position.x = parent.frame.width + star.size.width
         star.position.y = CGFloat(parent.frame.midY - 10 + rnd)
         

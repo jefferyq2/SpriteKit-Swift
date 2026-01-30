@@ -16,15 +16,7 @@ extension SKNode {
             return nil
         }
         
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
-            return nil
-        }
-        
-        guard let scene = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? GameScene else {
-            return nil
-        }
-        
-        return scene
+        return SKScene(fileNamed: file)
     }
 }
 
