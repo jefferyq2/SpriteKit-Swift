@@ -10,106 +10,105 @@ import Foundation
 import SpriteKit
 
 struct ContactCategory {
-    static let charactor : UInt32 = 0x1 << 0;
-    static let star      : UInt32 = 0x1 << 1;
+    static let charactor : UInt32 = 0x1 << 0
+    static let star      : UInt32 = 0x1 << 1
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
-    let sound : SKAction = SKAction.playSoundFileNamed("star.caf", waitForCompletion: false);
+    let sound : SKAction = SKAction.playSoundFileNamed("star.caf", waitForCompletion: false)
     
-    var isJump : Bool = false;
+    var isJump : Bool = false
     
     var background : SKSpriteNode!
     var parallax : [ParallaxSprite]!
     var player : SKSpriteNode!
-    var stars : [SKSpriteNode] = [];
+    var stars : [SKSpriteNode] = []
     
-    var starCounter : Int = 0;
+    var starCounter : Int = 0
     
-    override func didMoveToView(view: SKView) {
+    override func didMove(to view: SKView) {
         let ref = CreateManager.createBackground(self);
         
-        background = ref.background;
-        parallax = ref.parallax;
+        background = ref.background
+        parallax = ref.parallax
     
-        player = CreateManager.createCharacter(self);
+        player = CreateManager.createCharacter(self)
         
-        self.physicsWorld.contactDelegate = self;
-        self.physicsWorld.gravity = CGVectorMake(0, 0);
+        self.physicsWorld.contactDelegate = self
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
     }
    
-    override func update(currentTime: CFTimeInterval) {
+    override func update(_ currentTime: TimeInterval) {
         for p : ParallaxSprite in parallax {
-            p.update();
+            p.update()
         }
         
-        self.updateStars();
+        self.updateStars()
     }
     
     func updateStars() {
-        starCounter++;
+        starCounter += 1
         
         if(starCounter % 50 == 0){
-            stars.insert(CreateManager.createStar(self), atIndex: 0);
+            stars.insert(CreateManager.createStar(self), at: 0)
         }
         
-        for var index = stars.count - 1; index >= 0; --index {
-            let star : SKSpriteNode = stars[index];
-            star.position.x -= 10;
+        for index in stride(from: stars.count - 1, through: 0, by: -1) {
+            let star : SKSpriteNode = stars[index]
+            star.position.x -= 10
             
             if(star.position.x < 0 - star.size.width){
-                stars.removeAtIndex(index);
-                star.removeFromParent();
+                stars.remove(at: index)
+                star.removeFromParent()
             }
         }
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if(!isJump){
-            let touch : AnyObject? = touches.anyObject();
-            if (touch != nil) {
+            if let _ = touches.first {
                 
-                let jumpAction : SKAction = SKAction.moveTo(CGPointMake(player.position.x, player.position.y + 200), duration: 0.3);
-                let fallAction : SKAction = SKAction.moveTo(CGPointMake(player.position.x, CGRectGetMidY(self.frame) - 150), duration: 0.3);
-                let completeAction : SKAction = SKAction.runBlock({
-                    self.isJump = false;
-                });
+                let jumpAction : SKAction = SKAction.move(to: CGPoint(x: player.position.x, y: player.position.y + 200), duration: 0.3)
+                let fallAction : SKAction = SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.midY - 150), duration: 0.3)
+                let completeAction : SKAction = SKAction.run({
+                    self.isJump = false
+                })
 
-                player.runAction(SKAction.sequence([jumpAction, fallAction, completeAction]));
+                player.run(SKAction.sequence([jumpAction, fallAction, completeAction]))
                 
-                isJump = true;
+                isJump = true
             }
         }
     }
     
-    func didBeginContact(contact : SKPhysicsContact){
-        var firstBody : SKPhysicsBody;
-        var secondBody : SKPhysicsBody;
+    func didBegin(_ contact: SKPhysicsContact){
+        var firstBody : SKPhysicsBody
+        var secondBody : SKPhysicsBody
         
         if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask) {
-            firstBody = contact.bodyA;
-            secondBody = contact.bodyB;
+            firstBody = contact.bodyA
+            secondBody = contact.bodyB
         } else {
-            firstBody = contact.bodyB;
-            secondBody = contact.bodyA;
+            firstBody = contact.bodyB
+            secondBody = contact.bodyA
         }
         
         if ((firstBody.categoryBitMask & ContactCategory.star) != 0) {
-            self.destroyStar(firstBody.node!);
-            self.runAction(sound);
+            self.destroyStar(firstBody.node!)
+            self.run(sound)
         }
     }
     
-    func destroyStar(star : SKNode) {
-        for var index = stars.count - 1; index >= 0; --index {
-            let s : SKSpriteNode = stars[index];
+    func destroyStar(_ star : SKNode) {
+        for index in stride(from: stars.count - 1, through: 0, by: -1) {
+            let s : SKSpriteNode = stars[index]
     
             if(s == star){
-                stars.removeAtIndex(index)
-                star.removeFromParent();
+                stars.remove(at: index)
+                star.removeFromParent()
                 
-                return;
+                return
             }
         }
     }
